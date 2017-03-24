@@ -25,6 +25,7 @@
 #import "AWSMObileAnalyticsDefaultSessionClient.h"
 #import <UIKit/UIKit.h>
 #import "AWSMobileAnalyticsClientContext.h"
+#import "AWSMobileAnalyticsCustomUserDefaultEventStore.h"
 
 NSUInteger const AWSMobileAnalyticsDefaultDeliveryClientMaxOperations = 1000;
 
@@ -56,7 +57,8 @@ NSUInteger const AWSMobileAnalyticsDefaultDeliveryClientMaxOperations = 1000;
 + (AWSMobileAnalyticsDefaultDeliveryClient*)deliveryClientWithContext:(id<AWSMobileAnalyticsContext>)context
                                                       withWanDelivery:(BOOL)allowWANDelivery
                                                    withOperationQueue:(NSOperationQueue *)operationQueue {
-    id<AWSMobileAnalyticsEventStore> eventStore = [AWSMobileAnalyticsFileEventStore fileStoreWithContext:context];
+    // Change made to uses our custom event store.
+    id<AWSMobileAnalyticsEventStore> eventStore = [AWSMobileAnalyticsCustomUserDefaultEventStore fileStoreWithContext:context];
 
     AWSMobileAnalyticsDeliveryPolicyFactory* factory = [AWSMobileAnalyticsDeliveryPolicyFactory factoryWithSystem:context.system
                                                                                                   withPreferences:context.system.preferences

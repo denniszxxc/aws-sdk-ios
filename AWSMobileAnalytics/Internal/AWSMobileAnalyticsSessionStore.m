@@ -22,6 +22,8 @@ NSString *const KEY_SESSION_ID = @"sessionId";
 NSString *const KEY_SESSION_START_TIME = @"sessionStartTime";
 NSString *const KEY_SESSION_STOP_TIME = @"sessionStopTime";
 
+NSString *const KEY_SESSION_USER_DEFAULT = @"sesssionUserDefault";
+
 @interface AWSMobileAnalyticsSessionStore()
 
 @property (nonatomic, strong) NSRecursiveLock *fileLock;
@@ -57,11 +59,10 @@ NSString *const KEY_SESSION_STOP_TIME = @"sessionStopTime";
 
     [self.fileLock lock];
     @try {
-        serializedSession = [self.fileManager readDataFromFile:self.file
-                                                    withFormat:JSON
-                                                     withError:&error];
-        [self.fileManager deleteFile:self.file
-                               error:&error];
+        // Modify to read/write data to userDefault instead of file for tvOS
+        serializedSession = [[NSUserDefaults standardUserDefaults] dictionaryForKey:KEY_SESSION_USER_DEFAULT];
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:KEY_SESSION_USER_DEFAULT];
+        [[NSUserDefaults standardUserDefaults] synchronize];
     } @finally {
         [self.fileLock unlock];
     }
@@ -122,7 +123,9 @@ NSString *const KEY_SESSION_STOP_TIME = @"sessionStopTime";
     [self.fileLock lock];
     BOOL success = NO;
     @try {
-        success = [self.fileManager writeData:sessionDetails toFile:self.file withFormat:JSON withError:&error];
+        // Modify to write data to userDefault instead of file for tvOS
+        [[NSUserDefaults standardUserDefaults] setObject:sessionDetails forKey:KEY_SESSION_USER_DEFAULT];
+        success = [[NSUserDefaults standardUserDefaults] synchronize];
     } @finally {
         [self.fileLock unlock];
     }
@@ -143,7 +146,10 @@ NSString *const KEY_SESSION_STOP_TIME = @"sessionStopTime";
 
     [self.fileLock lock];
     @try {
-        deleteSuccessful = [self.fileManager deleteFile:self.file error:&error];
+        // Modify to write data to userDefault instead of file for tvOS
+        [[NSUserDefaults standardUserDefaults] removeObjectForKey:KEY_SESSION_USER_DEFAULT];
+        deleteSuccessful = [[NSUserDefaults standardUserDefaults] synchronize];
+
     } @finally {
         [self.fileLock unlock];
     }
