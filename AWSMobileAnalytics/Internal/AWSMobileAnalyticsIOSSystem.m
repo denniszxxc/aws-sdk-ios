@@ -216,7 +216,7 @@ static NSString* const UNIQUE_ID_KEY = @"UniqueId";
 
 + (NSString *) rootFileDirectoryWithFileManager:(NSFileManager *) theFileManager
 {
-    NSArray* possibleURLs = [theFileManager URLsForDirectory:NSApplicationSupportDirectory inDomains:NSUserDomainMask];
+    NSArray* possibleURLs = [theFileManager URLsForDirectory:NSCachesDirectory inDomains:NSUserDomainMask];
     NSURL *url = [possibleURLs objectAtIndex:0];
     return [url path];
 }
