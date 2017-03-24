@@ -22,6 +22,9 @@ NSString * const AWSPreferencesFilename = @"preferences";
 
 NSString * const AWSIOSPreferencesErrorDomain = @"com.amazon.insights-framework.AWSIOSPreferencesErrorDomain";
 
+NSString * const AWSPreferencesUserDefaultKey = @"AWSPreferencesUserDefaultKey";
+
+
 @interface AWSMobileAnalyticsIOSPreferences()
 
 @property (nonatomic, readwrite) AWSMobileAnalyticsFile* file;
@@ -59,16 +62,18 @@ NSString * const AWSIOSPreferencesErrorDomain = @"com.amazon.insights-framework.
 
         NSError *createError;
         self.file = [self.fileManager createFileWithPath:AWSPreferencesFilename error:&createError];
-        if(self.file != nil && createError == nil) {
+//        if(self.file != nil && createError == nil) {
+        
+            // Always loadPreferences ignoreing file creationg
             [self loadPreferences];
-        } else {
-            if(createError != nil) {
-                AWSLogError( @"Error creating preferences file. %@", [createError localizedDescription]);
-            } else {
-                AWSLogError( @"The preferences file could not be created");
-            }
-            return nil;
-        }
+//        } else {
+//            if(createError != nil) {
+//                AWSLogError( @"Error creating preferences file. %@", [createError localizedDescription]);
+//            } else {
+//                AWSLogError( @"The preferences file could not be created");
+//            }
+//            return nil;
+//        }
     }
     return self;
 }
@@ -76,7 +81,9 @@ NSString * const AWSIOSPreferencesErrorDomain = @"com.amazon.insights-framework.
 - (void) writePreferences
 {
     NSError *error = nil;
-    BOOL success = [self.fileManager writeData:self.preferences toFile:self.file withFormat:JSON withError:&error];
+    [[NSUserDefaults standardUserDefaults] setObject:self.preferences forKey:AWSPreferencesUserDefaultKey];
+    BOOL success = [[NSUserDefaults standardUserDefaults] synchronize];
+    
     if(error != nil || !success)
     {
         if(error != nil)
@@ -92,7 +99,7 @@ NSString * const AWSIOSPreferencesErrorDomain = @"com.amazon.insights-framework.
 
 - (void) loadPreferences {
     NSError *error = nil;
-    NSDictionary *prefs = [self.fileManager readDataFromFile:self.file withFormat:JSON withError:&error];
+    NSDictionary *prefs = [[NSUserDefaults standardUserDefaults] dictionaryForKey:AWSPreferencesUserDefaultKey];
 
     if (!prefs[@"UniqueId"]) {
         NSString *legacyParentDirectory = [self legacyParentDirectory];
