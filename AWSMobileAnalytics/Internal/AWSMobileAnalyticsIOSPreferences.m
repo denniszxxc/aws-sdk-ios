@@ -154,7 +154,7 @@ NSString * const AWSPreferencesUserDefaultKey = @"AWSPreferencesUserDefaultKey";
 }
 
 - (NSString *)legacyParentDirectory {
-    NSArray *URLsForDirectory = [[NSFileManager defaultManager] URLsForDirectory:NSApplicationSupportDirectory
+    NSArray *URLsForDirectory = [[NSFileManager defaultManager] URLsForDirectory:NSCachesDirectory
                                                                        inDomains:NSUserDomainMask];
     NSURL *URL = [URLsForDirectory objectAtIndex:0];
     return [URL path];
